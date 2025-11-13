@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Manajemen Request Item Baru')
+@section('title', 'Manajemen Item yang Belum Ada pada Data')
 
 @section('content')
 <div class="container-fluid py-4">
@@ -8,10 +8,10 @@
         {{-- HEADER --}}
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
-                <h3 class="fw-bold mb-1">📦 Request Item Baru</h3>
-                <p class="text-muted mb-0">Kelola request item baru dari pengguna</p>
+                <h3 class="fw-bold mb-1">📦  Belum Ada padItem yanga Data</h3>
+                <p class="text-muted mb-0">Kelola item yang belum ada pada data dari pengguna</p>
             </div>
-            
+
         </div>
 
         {{-- NOTIFIKASI --}}
@@ -63,12 +63,12 @@
             </div>
         </div>
 
-        {{-- TABEL REQUEST ITEM --}}
+        {{-- TABEL ITEM YANG BELUM ADA --}}
         <div class="card shadow-sm border-0">
             <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">📋 Daftar Request Item Baru</h5>
+                <h5 class="mb-0">📋 Daftar Item yang Belum Ada pada Data</h5>
                 <span class="badge bg-light text-dark">
-                    Total: {{ $temporaryItems->count() }} request
+                    Total: {{ $temporaryItems->count() }} item
                 </span>
             </div>
             <div class="card-body p-0">
@@ -151,13 +151,13 @@
                                             <div class="modal-dialog">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
-                                                        <h5 class="modal-title">Tolak Request Item</h5>
+                                                        <h5 class="modal-title">Tolak Item yang Belum Ada</h5>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                                     </div>
                                                     <form action="{{ route('admin.temp.items.reject', $item->id_temporary) }}" method="POST">
                                                         @csrf
                                                         <div class="modal-body">
-                                                            <p>Anda akan menolak request item: <strong>{{ $item->nama_barang_baru }}</strong></p>
+                                                            <p>Anda akan menolak item yang belum ada: <strong>{{ $item->nama_barang_baru }}</strong></p>
                                                             <div class="mb-3">
                                                                 <label for="alasan_penolakan" class="form-label">Alasan Penolakan</label>
                                                                 <textarea name="alasan_penolakan" class="form-control" rows="3"
@@ -166,7 +166,7 @@
                                                         </div>
                                                         <div class="modal-footer">
                                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                                            <button type="submit" class="btn btn-danger">Tolak Request</button>
+                                                            <button type="submit" class="btn btn-danger">Tolak Item</button>
                                                         </div>
                                                     </form>
                                                 </div>
@@ -199,7 +199,7 @@
                                 <td colspan="7" class="text-center text-muted py-5">
                                     <div class="py-4">
                                         <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
-                                        <p class="mb-0">Tidak ada request item baru</p>
+                                        <p class="mb-0">Tidak ada item yang belum ada pada data</p>
                                     </div>
                                 </td>
                             </tr>

@@ -29,6 +29,9 @@ class Pengaduan extends Model
         'saran_petugas',
     ];
 
+    // tampilkan accessor di JSON otomatis
+    protected $appends = ['foto_url', 'foto_penyelesaian_url'];
+
     // Tambahkan konstanta status
     const STATUS_DIAJUKAN = 'Diajukan';
     const STATUS_DISETUJUI = 'Disetujui';
@@ -51,6 +54,7 @@ class Pengaduan extends Model
         return $this->belongsTo(Item::class, 'id_item');
     }
 
+
     // Perbaiki accessor untuk foto URL
     public function getFotoUrlAttribute()
     {
@@ -68,8 +72,8 @@ class Pengaduan extends Model
             return asset('storage/' . $this->foto);
         }
 
-        // Fallback ke path langsung
-        return asset('storage/' . $this->foto);
+        // Fallback ke path langsung (kembali path, Flutter akan konstruksi URL)
+        return $this->foto;
     }
 
     public function getFotoPenyelesaianUrlAttribute()
@@ -86,7 +90,7 @@ class Pengaduan extends Model
             return asset('storage/' . $this->foto_penyelesaian);
         }
 
-        return asset('storage/' . $this->foto_penyelesaian);
+        return $this->foto_penyelesaian;
     }
 
     // Method untuk mengecek apakah bisa diupdate oleh admin

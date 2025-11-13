@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\DB;
 class TemporaryItemController extends Controller
 {
     /**
-     * Menampilkan halaman daftar request item baru (Temporary Items).
+     * Menampilkan halaman daftar item yang belum ada pada data (Temporary Items).
      */
     public function index(Request $request)
     {
@@ -51,7 +51,7 @@ class TemporaryItemController extends Controller
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
             ]);
-            return back()->with('error', 'Terjadi kesalahan saat memuat data item baru.');
+            return back()->with('error', 'Terjadi kesalahan saat memuat data item yang belum ada.');
         }
     }
 
@@ -74,14 +74,18 @@ class TemporaryItemController extends Controller
             $item = Item::create([
                 'nama_item' => $temporaryItem->nama_barang_baru,
                 'deskripsi' => 'Item baru dari request pengguna: ' . ($temporaryItem->pengaduan->nama_pengaduan ?? 'N/A'),
-                'stok' => 0, // Asumsi field stok wajib
             ]);
 
-            // 2. Hubungkan item dengan Lokasi
+            // 2. Hubungkan item dengan Lokasi melalui list_lokasi
             $lokasi = Lokasi::where('nama_lokasi', $temporaryItem->lokasi_barang_baru)->first();
             if ($lokasi) {
-                // Asumsi relasi many-to-many (lokasis) sudah benar
+                // Hubungkan item dengan lokasi melalui tabel pivot list_lokasi
                 $item->lokasis()->attach($lokasi->id_lokasi);
+            } else {
+                // Jika lokasi tidak ditemukan, rollback dan beri error
+                DB::rollBack();
+                return redirect()->route('admin.temp.items')
+                                ->with('error', 'Lokasi "' . $temporaryItem->lokasi_barang_baru . '" tidak ditemukan. Pastikan lokasi sudah terdaftar.');
             }
 
             // 3. Update status Temporary Item dan hubungkan ke ID Item yang baru
@@ -138,7 +142,7 @@ class TemporaryItemController extends Controller
             ]);
 
             return redirect()->route('admin.temp.items')
-                             ->with('success', 'Request item **' . $temporaryItem->nama_barang_baru . '** berhasil ditolak.');
+                             ->with('success', 'Item **' . $temporaryItem->nama_barang_baru . '** berhasil ditolak.');
 
         } catch (\Exception $e) {
             Log::error('Error saat menolak Temporary Item:', [
@@ -164,7 +168,7 @@ class TemporaryItemController extends Controller
             $temporaryItem->delete();
 
             return redirect()->route('admin.temp.items')
-                             ->with('success', 'Request item **' . $namaItem . '** berhasil dihapus.');
+                             ->with('success', 'Item **' . $namaItem . '** berhasil dihapus.');
 
         } catch (\Exception $e) {
             Log::error('Error saat menghapus Temporary Item:', [

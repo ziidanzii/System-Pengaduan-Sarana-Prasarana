@@ -14,7 +14,7 @@ class AdminPengaduanController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
-        
+
         // Cek apakah user adalah admin
         if ($user->role !== 'admin' && $user->role !== 'administrator') {
             return response()->json([
@@ -42,6 +42,13 @@ class AdminPengaduanController extends Controller
 
         $pengaduan = $query->orderByDesc('tgl_pengajuan')->get();
 
+        // Pastikan foto field ada di response
+        $pengaduan->transform(function ($item) {
+            // Foto sudah ada di model, tidak perlu transform
+            // Tapi pastikan field foto ada
+            return $item;
+        });
+
         return response()->json($pengaduan);
     }
 
@@ -51,7 +58,7 @@ class AdminPengaduanController extends Controller
     public function show(Request $request, $id)
     {
         $user = $request->user();
-        
+
         // Cek apakah user adalah admin
         if ($user->role !== 'admin' && $user->role !== 'administrator') {
             return response()->json([
@@ -72,7 +79,7 @@ class AdminPengaduanController extends Controller
     public function update(Request $request, $id)
     {
         $user = $request->user();
-        
+
         // Cek apakah user adalah admin
         if ($user->role !== 'admin' && $user->role !== 'administrator') {
             return response()->json([
@@ -110,5 +117,4 @@ class AdminPengaduanController extends Controller
         ]);
     }
 }
-
 

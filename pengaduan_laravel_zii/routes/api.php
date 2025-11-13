@@ -14,6 +14,8 @@ Route::post('/login', [AuthController::class, 'login']);
 // Public routes untuk lokasi dan item (tidak perlu auth)
 Route::get('/lokasi', [LokasiController::class, 'index']);
 Route::get('/item', [ItemController::class, 'index']);
+Route::post('/item', [ItemController::class, 'index']);
+Route::post('/register', [AuthController::class, 'register']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
@@ -21,7 +23,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/pengaduan', [PengaduanApiController::class, 'store']);
     Route::get('/pengaduan/{id}', [PengaduanApiController::class, 'show']);
     Route::delete('/pengaduan/{id}', [PengaduanApiController::class, 'destroy']);
-    
+    Route::get('/user', [AuthController::class, 'me']);
+    Route::put('/profile', [AuthController::class, 'updateProfile']);
     // Admin routes
     Route::prefix('admin')->group(function () {
         Route::get('/pengaduan', [AdminPengaduanController::class, 'index']);

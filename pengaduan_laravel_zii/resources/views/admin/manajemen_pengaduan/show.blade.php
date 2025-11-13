@@ -77,7 +77,7 @@
                                 </p>
                             @else
                                 <p class="text-warning">
-                                    <i class="fas fa-clock me-2"></i>Request Item Baru
+                                    <i class="fas fa-clock me-2"></i>Item yang Belum Ada pada Data
                                 </p>
                             @endif
                         </div>
@@ -232,20 +232,20 @@
                             </a>
                         </div>
                     @else
-                        <!-- JIKA TIDAK ADA ITEM EXISTING, CEK APAKAH ADA REQUEST ITEM BARU -->
+                        <!-- JIKA TIDAK ADA ITEM EXISTING, CEK APAKAH ADA ITEM YANG BELUM ADA -->
                         @php
                             $temporaryItem = \App\Models\TemporaryItem::where('id_pengaduan', $pengaduan->id_pengaduan)->first();
                         @endphp
 
                         @if($temporaryItem)
-                            <!-- JIKA ADA REQUEST ITEM BARU -->
+                            <!-- JIKA ADA ITEM YANG BELUM ADA -->
                             <div class="alert alert-warning">
                                 <h6 class="alert-heading mb-3">
-                                    <i class="fas fa-clock me-1"></i>Request Item Baru
+                                    <i class="fas fa-clock me-1"></i>Item yang Belum Ada pada Data
                                 </h6>
 
                                 <div class="mb-3">
-                                    <strong>Nama Item Baru:</strong>
+                                    <strong>Nama Item yang Belum Ada:</strong>
                                     <p class="mb-1 fw-semibold">{{ $temporaryItem->nama_barang_baru }}</p>
                                 </div>
 

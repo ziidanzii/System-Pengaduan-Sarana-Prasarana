@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'pages/login_page.dart';
 import 'api/api_service.dart';
-import 'pages/form_pengaduan_page.dart';
-import 'pages/admin_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,10 +18,13 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Aplikasi Pengaduan Sarpras',
-      theme: ThemeData(primarySwatch: Colors.blue),
-      home: api.token != null 
-          ? FormPengaduanPage(api: api)
-          : const LoginPage(),
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        useMaterial3: true,
+      ),
+      // Selalu mulai dari halaman login
+      home: const LoginPage(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }

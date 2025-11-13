@@ -126,30 +126,30 @@
                         </div>
                     </div>
 
-                    <!-- Opsi: Request Item Baru -->
+                    <!-- Opsi: Item yang Belum Ada -->
                     <div class="mt-3">
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="request_item_baru" name="request_item_baru" value="1" {{ old('request_item_baru') ? 'checked' : '' }}>
                             <label class="form-check-label text-dark" for="request_item_baru">
                                 <i class="fas fa-plus-circle me-2 text-primary"></i>
-                                Request Item Baru (jika item tidak ada dalam daftar)
+                                Item yang Belum Ada pada Data (jika item tidak ada dalam daftar)
                             </label>
                         </div>
                     </div>
 
-                    <!-- Section: Item Baru -->
+                    <!-- Section: Item yang Belum Ada -->
                     <div class="form-section mt-3" id="itemBaruSection" style="display: none;">
                         <h6 class="section-title text-warning mb-3">
                             <i class="fas fa-plus-circle me-2"></i>
-                            Form Request Item Baru
+                            Form Item yang Belum Ada pada Data
                         </h6>
 
                         <div class="alert alert-warning">
                             <div class="d-flex align-items-center">
                                 <i class="fas fa-exclamation-triangle me-3 text-warning"></i>
                                 <div>
-                                    <h6 class="mb-1 text-dark">Request Item Baru</h6>
-                                    <p class="mb-0 text-muted">Item yang Anda request akan ditinjau oleh admin sebelum ditambahkan ke sistem.</p>
+                                    <h6 class="mb-1 text-dark">Item yang Belum Ada pada Data</h6>
+                                    <p class="mb-0 text-muted">Item yang Anda ajukan akan ditinjau oleh admin sebelum ditambahkan ke sistem dan terhubung dengan lokasi yang dipilih.</p>
                                 </div>
                             </div>
                         </div>
@@ -157,11 +157,11 @@
                         <div class="mb-3">
                             <label for="item_baru" class="form-label text-dark">
                                 <i class="fas fa-cube me-2 text-primary"></i>
-                                Nama Item Baru <span class="text-danger">*</span>
+                                Nama Item yang Belum Ada <span class="text-danger">*</span>
                             </label>
                             <input type="text" class="form-control-custom @error('item_baru') is-invalid @enderror"
                                    id="item_baru" name="item_baru" value="{{ old('item_baru') }}"
-                                   placeholder="Masukkan nama item baru yang ingin direquest"
+                                   placeholder="Masukkan nama item yang belum ada pada data"
                                    maxlength="200">
                             <div class="character-count">
                                 <span id="itemBaruCount">0</span>/200 karakter
@@ -202,7 +202,7 @@
 
                 <!-- Tombol Aksi -->
                 <div class="d-flex gap-3 mt-4 pt-3 border-top">
-                    
+
                     <button type="submit" class="btn btn-submit flex-fill">
                         <i class="fas fa-paper-plane me-2"></i>
                         Kirim Aduan
@@ -481,7 +481,7 @@ document.getElementById('item_baru').addEventListener('input', function() {
     document.getElementById('itemBaruCount').textContent = this.value.length;
 });
 
-// Toggle section item baru
+// Toggle section item yang belum ada
 document.getElementById('request_item_baru').addEventListener('change', function() {
     const itemBaruSection = document.getElementById('itemBaruSection');
     const itemSelect = document.getElementById('id_item');
@@ -498,7 +498,7 @@ document.getElementById('request_item_baru').addEventListener('change', function
     }
 });
 
-// Saat item existing dipilih, nonaktifkan request item baru
+// Saat item existing dipilih, nonaktifkan item yang belum ada
 document.getElementById('id_item').addEventListener('change', function() {
     const requestCheckbox = document.getElementById('request_item_baru');
 
@@ -519,7 +519,7 @@ document.getElementById('lokasi').addEventListener('change', function() {
         itemSelect.innerHTML = '<option value="">Memuat item...</option>';
         itemSelect.disabled = true;
 
-        // Reset request item baru
+        // Reset item yang belum ada
         requestCheckbox.checked = false;
         itemBaruSection.style.display = 'none';
         document.getElementById('item_baru').value = '';
@@ -551,7 +551,7 @@ document.getElementById('lokasi').addEventListener('change', function() {
         itemSelect.innerHTML = '<option value="">-- Pilih Lokasi Terlebih Dahulu --</option>';
         itemSelect.disabled = true;
 
-        // Reset request item baru
+        // Reset item yang belum ada
         requestCheckbox.checked = false;
         itemBaruSection.style.display = 'none';
         document.getElementById('item_baru').value = '';
@@ -668,10 +668,10 @@ document.getElementById('aduanForm').addEventListener('submit', function(e) {
         errorMessage = 'Lokasi harus diisi!';
     } else if (!idItem && !requestItemBaru) {
         isValid = false;
-        errorMessage = 'Silakan pilih item yang ada atau request item baru!';
+        errorMessage = 'Silakan pilih item yang ada atau ajukan item yang belum ada pada data!';
     } else if (requestItemBaru && !itemBaru) {
         isValid = false;
-        errorMessage = 'Nama item baru harus diisi!';
+        errorMessage = 'Nama item yang belum ada harus diisi!';
     }
 
     if (!isValid) {

@@ -54,8 +54,8 @@ class AduanController extends Controller
             'item_baru'      => 'nullable|string|max:500',
             'foto'           => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ], [
-            'id_item.required_without' => 'Pilih item yang ada atau request item baru',
-            'item_baru.required_without' => 'Pilih item yang ada atau request item baru',
+            'id_item.required_without' => 'Pilih item yang ada atau ajukan item yang belum ada pada data',
+            'item_baru.required_without' => 'Pilih item yang ada atau ajukan item yang belum ada pada data',
         ]);
 
         // 2. Validasi custom untuk memastikan salah satu dipilih
@@ -64,7 +64,7 @@ class AduanController extends Controller
         if ($itemCount > 1) {
             return redirect()->back()
                 ->withInput()
-                ->withErrors(['item_baru' => 'Hanya boleh request 1 item baru per pengaduan.']);
+                ->withErrors(['item_baru' => 'Hanya boleh mengajukan 1 item yang belum ada per pengaduan.']);
         }
     }
 
@@ -92,7 +92,7 @@ class AduanController extends Controller
         // 4. Buat pengaduan utama
         $pengaduan = Pengaduan::create($data);
 
-        // 5. Handle request item baru
+        // 5. Handle item yang belum ada pada data
         if ($request->filled('item_baru')) {
             $newItems = collect(explode(',', $request->item_baru))
                             ->map(fn($item) => trim($item))
@@ -114,7 +114,7 @@ class AduanController extends Controller
 
         return redirect()->route('user.aduan.history')
             ->with('success', 'Aduan berhasil diajukan!' .
-            ($request->filled('item_baru') ? ' Request item baru juga telah dikirim untuk persetujuan admin.' : ''));
+            ($request->filled('item_baru') ? ' Item yang belum ada juga telah dikirim untuk persetujuan admin.' : ''));
     }
 
     /**

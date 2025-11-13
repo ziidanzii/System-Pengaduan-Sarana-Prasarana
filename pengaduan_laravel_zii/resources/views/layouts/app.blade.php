@@ -433,12 +433,12 @@
         </a>
     </li>
 
-    <!-- Request Item -->
+    <!-- Item yang Belum Ada -->
     <li class="nav-item">
         <a class="nav-link d-flex align-items-center gap-2 position-relative {{ request()->routeIs('admin.temp.items') ? 'active' : '' }}"
            href="{{ route('admin.temp.items') }}">
             <i class="fas fa-inbox"></i>
-            <span>Request Item</span>
+            <span>Item request</span>
             @php
                 $pendingCount = \App\Models\TemporaryItem::where('status', 'pending')->count();
             @endphp

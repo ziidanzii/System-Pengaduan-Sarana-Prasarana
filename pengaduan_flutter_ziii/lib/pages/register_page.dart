@@ -2,34 +2,55 @@ import 'package:flutter/material.dart';
 import '../api/api_service.dart';
 import 'form_pengaduan_page.dart';
 import 'admin/dashboard.dart';
-import 'register_page.dart';
+import 'login_page.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class RegisterPage extends StatefulWidget {
+  final ApiService api;
+  const RegisterPage({super.key, required this.api});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
-  late final ApiService api;
+class _RegisterPageState extends State<RegisterPage> {
+  final namaController = TextEditingController();
+  final usernameController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  final confirmPasswordController = TextEditingController();
   bool isLoading = false;
   bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
 
-  @override
-  void initState() {
-    super.initState();
-    api = ApiService();
-    api.init();
-  }
-
-  void handleLogin() async {
-    if (emailController.text.isEmpty || passwordController.text.isEmpty) {
+  void handleRegister() async {
+    if (namaController.text.isEmpty ||
+        usernameController.text.isEmpty ||
+        emailController.text.isEmpty ||
+        passwordController.text.isEmpty ||
+        confirmPasswordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Email/Username dan password harus diisi"),
+          content: Text("Semua field harus diisi"),
+          backgroundColor: Color(0xFFFF5722),
+        ),
+      );
+      return;
+    }
+
+    if (passwordController.text != confirmPasswordController.text) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Password dan konfirmasi password tidak sama"),
+          backgroundColor: Color(0xFFFF5722),
+        ),
+      );
+      return;
+    }
+
+    if (passwordController.text.length < 6) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Password minimal 6 karakter"),
           backgroundColor: Color(0xFFFF5722),
         ),
       );
@@ -37,36 +58,42 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     setState(() => isLoading = true);
-    final result = await api.login(emailController.text, passwordController.text);
+    final result = await widget.api.register(
+      namaPengguna: namaController.text,
+      username: usernameController.text,
+      email: emailController.text,
+      password: passwordController.text,
+      confirmPassword: confirmPasswordController.text,
+    );
     setState(() => isLoading = false);
 
     if (result['success'] == true) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(result['message'] ?? 'Login berhasil'),
+          content: Text(result['message'] ?? 'Registrasi berhasil'),
           backgroundColor: Color(0xFF4CAF50),
         ),
       );
       
-      // Cek role user untuk redirect
+      // Redirect berdasarkan role
       final user = result['user'];
       final role = user?['role'];
       
       if (role == 'admin' || role == 'administrator') {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (_) => AdminDashboardPage(api: api)),
+          MaterialPageRoute(builder: (_) => AdminDashboardPage(api: widget.api)),
         );
       } else {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (_) => FormPengaduanPage(api: api)),
+          MaterialPageRoute(builder: (_) => FormPengaduanPage(api: widget.api)),
         );
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(result['message'] ?? 'Login gagal'),
+          content: Text(result['message'] ?? 'Registrasi gagal'),
           backgroundColor: Color(0xFFF44336),
         ),
       );
@@ -85,7 +112,7 @@ class _LoginPageState extends State<LoginPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Header Section
-                const SizedBox(height: 40),
+                const SizedBox(height: 20),
                 Center(
                   child: Container(
                     width: 80,
@@ -102,7 +129,7 @@ class _LoginPageState extends State<LoginPage> {
                       ],
                     ),
                     child: Icon(
-                      Icons.report_problem_outlined,
+                      Icons.person_add_outlined,
                       color: Colors.white,
                       size: 40,
                     ),
@@ -111,7 +138,7 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(height: 24),
                 Center(
                   child: Text(
-                    "Sistem Pengaduan",
+                    "Daftar Akun Baru",
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
@@ -119,20 +146,10 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                 ),
-                Center(
-                  child: Text(
-                    "Sarana Prasarana",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFFE65100),
-                    ),
-                  ),
-                ),
                 const SizedBox(height: 8),
                 Center(
                   child: Text(
-                    "Masuk ke akun Anda",
+                    "Buat akun untuk mulai mengajukan pengaduan",
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.grey[600],
@@ -164,7 +181,7 @@ class _LoginPageState extends State<LoginPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Informasi Login",
+                        "Informasi Akun",
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
@@ -173,7 +190,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        "Masukkan email atau username dan password Anda",
+                        "Isi data diri Anda dengan benar",
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.grey[600],
@@ -181,7 +198,73 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       const SizedBox(height: 24),
                       
-                      // Email/Username Input Container
+                      // Nama Lengkap Input
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.grey[50],
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: Colors.grey.shade300,
+                            width: 1,
+                          ),
+                        ),
+                        child: TextField(
+                          controller: namaController,
+                          style: TextStyle(
+                            color: Colors.grey[800],
+                            fontSize: 16,
+                          ),
+                          decoration: InputDecoration(
+                            labelText: "Nama Lengkap",
+                            labelStyle: TextStyle(color: Colors.grey[600]),
+                            prefixIcon: Container(
+                              margin: EdgeInsets.only(left: 8, right: 8),
+                              child: Icon(Icons.person_outline, color: Color(0xFFFF7043)),
+                            ),
+                            border: InputBorder.none,
+                            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                            hintText: "Masukkan nama lengkap",
+                            hintStyle: TextStyle(color: Colors.grey[400]),
+                          ),
+                        ),
+                      ),
+                      
+                      const SizedBox(height: 16),
+                      
+                      // Username Input
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.grey[50],
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: Colors.grey.shade300,
+                            width: 1,
+                          ),
+                        ),
+                        child: TextField(
+                          controller: usernameController,
+                          style: TextStyle(
+                            color: Colors.grey[800],
+                            fontSize: 16,
+                          ),
+                          decoration: InputDecoration(
+                            labelText: "Username",
+                            labelStyle: TextStyle(color: Colors.grey[600]),
+                            prefixIcon: Container(
+                              margin: EdgeInsets.only(left: 8, right: 8),
+                              child: Icon(Icons.alternate_email, color: Color(0xFFFF7043)),
+                            ),
+                            border: InputBorder.none,
+                            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                            hintText: "Masukkan username",
+                            hintStyle: TextStyle(color: Colors.grey[400]),
+                          ),
+                        ),
+                      ),
+                      
+                      const SizedBox(height: 16),
+                      
+                      // Email Input
                       Container(
                         decoration: BoxDecoration(
                           color: Colors.grey[50],
@@ -198,24 +281,24 @@ class _LoginPageState extends State<LoginPage> {
                             fontSize: 16,
                           ),
                           decoration: InputDecoration(
-                            labelText: "Email / Username",
+                            labelText: "Email",
                             labelStyle: TextStyle(color: Colors.grey[600]),
                             prefixIcon: Container(
                               margin: EdgeInsets.only(left: 8, right: 8),
-                              child: Icon(Icons.person_outline, color: Color(0xFFFF7043)),
+                              child: Icon(Icons.email_outlined, color: Color(0xFFFF7043)),
                             ),
                             border: InputBorder.none,
                             contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                            hintText: "email@contoh.com atau username",
+                            hintText: "contoh@email.com",
                             hintStyle: TextStyle(color: Colors.grey[400]),
                           ),
-                          keyboardType: TextInputType.text,
+                          keyboardType: TextInputType.emailAddress,
                         ),
                       ),
                       
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 16),
                       
-                      // Password Input Container
+                      // Password Input
                       Container(
                         decoration: BoxDecoration(
                           color: Colors.grey[50],
@@ -255,7 +338,55 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                             border: InputBorder.none,
                             contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                            hintText: "Masukkan password",
+                            hintText: "Minimal 6 karakter",
+                            hintStyle: TextStyle(color: Colors.grey[400]),
+                          ),
+                        ),
+                      ),
+                      
+                      const SizedBox(height: 16),
+                      
+                      // Confirm Password Input
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.grey[50],
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: Colors.grey.shade300,
+                            width: 1,
+                          ),
+                        ),
+                        child: TextField(
+                          controller: confirmPasswordController,
+                          style: TextStyle(
+                            color: Colors.grey[800],
+                            fontSize: 16,
+                          ),
+                          obscureText: _obscureConfirmPassword,
+                          decoration: InputDecoration(
+                            labelText: "Konfirmasi Password",
+                            labelStyle: TextStyle(color: Colors.grey[600]),
+                            prefixIcon: Container(
+                              margin: EdgeInsets.only(left: 8, right: 8),
+                              child: Icon(Icons.lock_reset, color: Color(0xFFFF7043)),
+                            ),
+                            suffixIcon: Container(
+                              margin: EdgeInsets.only(right: 8),
+                              child: IconButton(
+                                icon: Icon(
+                                  _obscureConfirmPassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                                  color: Colors.grey[500],
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    _obscureConfirmPassword = !_obscureConfirmPassword;
+                                  });
+                                },
+                              ),
+                            ),
+                            border: InputBorder.none,
+                            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                            hintText: "Ulangi password",
                             hintStyle: TextStyle(color: Colors.grey[400]),
                           ),
                         ),
@@ -264,9 +395,9 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
                 
-                const SizedBox(height: 32),
+                const SizedBox(height: 24),
                 
-                // Login Button
+                // Register Button
                 Container(
                   width: double.infinity,
                   height: 56,
@@ -297,7 +428,7 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         )
                       : TextButton(
-                          onPressed: handleLogin,
+                          onPressed: handleRegister,
                           style: TextButton.styleFrom(
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -307,7 +438,7 @@ class _LoginPageState extends State<LoginPage> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                "Masuk",
+                                "Daftar",
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 16,
@@ -315,32 +446,32 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                               ),
                               SizedBox(width: 8),
-                              Icon(Icons.arrow_forward, color: Colors.white, size: 20),
+                              Icon(Icons.person_add_alt_1, color: Colors.white, size: 20),
                             ],
                           ),
                         ),
                 ),
-
-                // Register Link - DIPINDAHKAN KE SINI
+                
+                // Login Link
                 const SizedBox(height: 24),
                 Center(
                   child: GestureDetector(
                     onTap: () {
-                      Navigator.push(
+                      Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (_) => RegisterPage(api: api)),
+                        MaterialPageRoute(builder: (_) => LoginPage()),
                       );
                     },
                     child: RichText(
                       text: TextSpan(
-                        text: "Belum punya akun? ",
+                        text: "Sudah punya akun? ",
                         style: TextStyle(
                           color: Colors.grey[600],
                           fontSize: 14,
                         ),
                         children: [
                           TextSpan(
-                            text: "Daftar di sini",
+                            text: "Masuk di sini",
                             style: TextStyle(
                               color: Color(0xFFE65100),
                               fontWeight: FontWeight.w600,
@@ -348,18 +479,6 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ],
                       ),
-                    ),
-                  ),
-                ),
-                
-                // Footer
-                const SizedBox(height: 20),
-                Center(
-                  child: Text(
-                    "Layanan Pengaduan Sarana Prasarana",
-                    style: TextStyle(
-                      color: Colors.grey[500],
-                      fontSize: 14,
                     ),
                   ),
                 ),

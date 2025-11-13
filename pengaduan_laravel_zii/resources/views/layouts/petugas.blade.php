@@ -273,6 +273,13 @@
                 margin-top: 1rem;
             }
         }
+        /* Gaya Khusus untuk Status 'Disetujui' */
+.status-disetujui {
+    background-color: var(--secondary) !important; /* Menggunakan secondary (abu-abu) */
+    color: var(--light) !important; /* Teks putih */
+    border-color: var(--secondary) !important; /* Jika itu tombol */
+}
+
     </style>
     @stack('styles')
 </head>
